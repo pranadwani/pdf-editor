@@ -1,0 +1,4 @@
+node_modules/
+release/
+src/renderer/vendor/
+*.pdfeditor-tmp

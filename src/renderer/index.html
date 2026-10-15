@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; worker-src 'self' blob:; font-src 'self' data:; connect-src 'self' data: blob:">
+  <title>PDF Editor</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="tabbar">
+      <div id="tabs" class="tabs" role="tablist"></div>
+      <button class="icon-btn tab-new" id="btnNewTab" title="Open PDF (Ctrl+O)" data-icon="plus"></button>
+    </header>
+
+    <nav class="toolbar" id="toolbar" aria-label="Tools">
+      <div class="group">
+        <button class="icon-btn" id="btnOpen" title="Open (Ctrl+O)" data-icon="folder"></button>
+        <button class="icon-btn" id="btnSave" title="Save (Ctrl+S)" data-icon="save"></button>
+        <button class="icon-btn" id="btnPrint" title="Print (Ctrl+P)" data-icon="print"></button>
+        <button class="icon-btn" id="btnSidebar" title="Page thumbnails (Ctrl+B)" data-icon="sidebar"></button>
+      </div>
+      <div class="sep"></div>
+      <div class="group" id="toolGroup" role="radiogroup" aria-label="Annotation tool">
+        <button class="icon-btn tool active" data-tool="select" title="Select and move (V)" data-icon="cursor"></button>
+        <button class="icon-btn tool" data-tool="highlight" title="Highlight area (H)" data-icon="highlight"></button>
+        <button class="icon-btn tool" data-tool="pen" title="Draw (P)" data-icon="pen"></button>
+        <button class="icon-btn tool" data-tool="text" title="Add text (T)" data-icon="text"></button>
+        <button class="icon-btn tool" data-tool="rect" title="Rectangle (R)" data-icon="square"></button>
+        <button class="icon-btn tool" data-tool="ellipse" title="Ellipse (E)" data-icon="circle"></button>
+        <button class="icon-btn tool" data-tool="line" title="Arrow (A)" data-icon="arrow"></button>
+        <button class="icon-btn tool" data-tool="whiteout" title="Whiteout: cover content with white (W)" data-icon="redact"></button>
+        <button class="icon-btn" id="btnSign" title="Add signature (S)" data-icon="sign"></button>
+      </div>
+      <div class="group swatches" id="swatches" aria-label="Color"></div>
+      <div class="group">
+        <select id="strokeSize" title="Stroke / text size">
+          <option value="1">Thin</option>
+          <option value="2" selected>Medium</option>
+          <option value="4">Thick</option>
+        </select>
+      </div>
+      <div class="sep"></div>
+      <div class="group">
+        <button class="icon-btn" id="btnUndo" title="Undo (Ctrl+Z)" data-icon="undo"></button>
+        <button class="icon-btn" id="btnRedo" title="Redo (Ctrl+Y)" data-icon="redo"></button>
+      </div>
+      <div class="sep"></div>
+      <div class="group">
+        <button class="icon-btn" id="btnRotL" title="Rotate page left" data-icon="rotl"></button>
+        <button class="icon-btn" id="btnRotR" title="Rotate page right" data-icon="rotr"></button>
+        <button class="icon-btn" id="btnDelPage" title="Delete page" data-icon="trash"></button>
+        <button class="icon-btn" id="btnMerge" title="Insert pages from another PDF" data-icon="merge"></button>
+      </div>
+      <div class="spacer"></div>
+      <div class="group zoom">
+        <button class="icon-btn" id="btnZoomOut" title="Zoom out (Ctrl+-)" data-icon="minus"></button>
+        <button class="zoom-label" id="zoomLabel" title="Fit width (Ctrl+0)">100%</button>
+        <button class="icon-btn" id="btnZoomIn" title="Zoom in (Ctrl+=)" data-icon="plus"></button>
+      </div>
+      <div class="group search">
+        <span data-icon="search" class="search-icon"></span>
+        <input id="searchInput" type="search" placeholder="Find in document" aria-label="Find in document">
+        <span id="searchCount" class="search-count"></span>
+        <button class="icon-btn small" id="btnPrevHit" title="Previous match (Shift+Enter)" data-icon="up"></button>
+        <button class="icon-btn small" id="btnNextHit" title="Next match (Enter)" data-icon="down"></button>
+      </div>
+      <button class="icon-btn" id="btnTheme" title="Toggle dark mode" data-icon="moon"></button>
+    </nav>
+
+    <main class="workspace">
+      <aside class="sidebar" id="sidebar" aria-label="Pages">
+        <div class="sidebar-head">Pages <span id="pageTotal"></span></div>
+              </aside>
+      <section class="viewer" id="viewer" tabindex="0" aria-label="Document"></section>
+
+      <section class="home" id="home">
+        <div class="home-inner">
+          <h1>Open a PDF to get started</h1>
+          <p>Read, annotate, sign and rearrange PDFs. Everything stays on this computer.</p>
+          <div class="dropzone" id="dropzone">
+            <span data-icon="file" class="drop-icon"></span>
+            <div><strong>Drop PDF files here</strong> or</div>
+            <button class="primary" id="btnHomeOpen">Choose files…</button>
+          </div>
+          <div class="recent" id="recentWrap">
+            <h2>Recent</h2>
+            <ul id="recentList"></ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="statusbar">
+      <span id="statusPage">No document</span>
+      <span id="statusMsg" class="status-msg"></span>
+      <span id="statusSaved"></span>
+    </footer>
+  </div>
+
+  <div class="modal" id="signModal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="signTitle">
+      <h2 id="signTitle">Draw your signature</h2>
+      <canvas id="signPad" width="560" height="200"></canvas>
+      <div class="modal-row">
+        <button id="signClear">Clear</button>
+        <div class="spacer"></div>
+        <button id="signCancel">Cancel</button>
+        <button class="primary" id="signUse">Place signature</button>
+      </div>
+      <p class="hint">After placing, click on the page where the signature should go. Drag it to move; drag the corner to resize.</p>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="printArea" class="print-area"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

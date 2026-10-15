@@ -1,0 +1,54 @@
+{
+  "name": "pdf-editor",
+  "productName": "PDF Editor",
+  "version": "1.0.0",
+  "description": "A local, offline PDF viewer and editor for the desktop.",
+  "main": "src/main.js",
+  "author": "PDF Editor",
+  "license": "MIT",
+  "scripts": {
+    "postinstall": "node scripts/copy-vendor.js",
+    "start": "electron .",
+    "dist": "electron-builder --win"
+  },
+  "dependencies": {
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.10.38"
+  },
+  "devDependencies": {
+    "@electron/fuses": "^1.8.0",
+    "electron": "^33.4.11",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "app.pdfeditor.desktop",
+    "productName": "PDF Editor",
+    "files": [
+      "src/**/*",
+      "!node_modules/**/*"
+    ],
+    "asar": true,
+    "fileAssociations": [
+      {
+        "ext": "pdf",
+        "name": "PDF Document",
+        "role": "Editor"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "directories": {
+      "output": "release"
+    },
+    "afterPack": "scripts/after-pack.js"
+  }
+}
