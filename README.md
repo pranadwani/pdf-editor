@@ -2,8 +2,6 @@
 
 A desktop PDF viewer and editor for Windows, built with Electron. It works fully offline and never uploads your files.
 
-Built as an original, clean-room take on what Lumin PDF's desktop app does. None of Lumin's code, branding or assets is used.
-
 ## What it does
 
 - **Tabs:** open several PDFs at once by drag and drop, Ctrl+O, or "Open with" from Explorer. Recent files are listed on the home screen.
